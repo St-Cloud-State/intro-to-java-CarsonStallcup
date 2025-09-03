@@ -1,0 +1,104 @@
+import java.util.*;
+import java.io.*;
+
+public class HWQ3 {
+    public static void main(String[] args) throws FileNotFoundException {
+        // Create a MyList<Person> object
+        MyList<Person> people = new MyList<>();
+
+        // Open an actual input file (example: "people.txt")
+        FileInputStream input = new FileInputStream("people.txt");
+
+        // Store data into the linked list inside MyList
+        people.store(input);
+
+        // Display the contents of the list
+        people.display(System.out);
+
+        // Try finding some IDs
+        System.out.println("Find ID 456: index = " + people.find("456"));
+        System.out.println("Find ID 999: index = " + people.find("999"));
+    }
+}
+
+// ========== Identifiable Interface ==========
+interface Identifiable {
+    String getID();
+}
+
+// ========== Generic MyList Class ==========
+class MyList<T extends Identifiable> {
+    private LinkedList<T> list;
+
+    public MyList() {
+        list = new LinkedList<>();
+    }
+
+    // store(): reads Person data from input stream and adds to list
+    // NOTE: this implementation is Person-specific because it parses firstname, lastname, ID.
+    // In a real generic version, we'd need a factory or parser, but for this assignment,
+    // we assume T is Person.
+    public void store(InputStream in) {
+        Scanner scanner = new Scanner(in);
+        while (scanner.hasNext()) {
+            String firstname = scanner.next();
+            String lastname = scanner.next();
+            String ID = scanner.next();
+            @SuppressWarnings("unchecked")
+            T obj = (T) new Person(firstname, lastname, ID);
+            list.add(obj);
+        }
+        scanner.close();
+    }
+
+    // display(): prints each object on a new line
+    public void display(PrintStream out) {
+        for (T item : list) {
+            out.println(item);
+        }
+    }
+
+    // find(): returns index of object with matching ID (or -1)
+    public int find(String sid) {
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).getID().equals(sid)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+}
+
+// ========== Person Class ==========
+class Person implements Identifiable {
+    private String firstname;
+    private String lastname;
+    private String ID;
+
+    // Constructor
+    public Person(String firstname, String lastname, String ID) {
+        this.firstname = firstname;
+        this.lastname = lastname;
+        this.ID = ID;
+    }
+
+    // Accessor methods
+    public String getFirstname() {
+        return firstname;
+    }
+
+    public String getLastname() {
+        return lastname;
+    }
+
+    @Override
+    public String getID() {
+        return ID;
+    }
+
+    // toString method
+    @Override
+    public String toString() {
+        return firstname + " " + lastname + " (ID: " + ID + ")";
+    }
+}
