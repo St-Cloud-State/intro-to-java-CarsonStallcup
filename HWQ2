@@ -1,88 +1,55 @@
-import java.io.*;
-import java.io.FileNotFoundException;
 import java.util.*;
-import java.awt.*;
-import javax.swing.*;
+import java.io.*;
 
-public class HWQ1 {
+public class HWQ2 {
     public static void main(String[] args) throws FileNotFoundException {
-        int item1 = 0, item2 = 0;
-        String fileName1, fileName2, outFileName;
-        File dataFile1, dataFile2, outFile;
-        boolean hasNext1 = false, hasNext2 = false;
+        LinkedList<Person> people = new LinkedList<>();
 
-        LinkedList l1 = new LinkedList(); // just a dummy
-        l1.add(new Integer(5)); //test
-        Integer i1 = (Integer)l1.getFirst();
-        System.out.println(i1);
+        // Open an actual input file (example: "people.txt")
+        FileInputStream input = new FileInputStream("people.txt");
 
-        Scanner keyScanner = new Scanner(System.in);
-        System.out.println("Please enter the first file name: ");
-        fileName1 = keyScanner.nextLine();
-        System.out.println("Please enter the second file name: ");
-        fileName2 = keyScanner.nextLine();
-        System.out.println("Please enter the output file name: ");
-        outFileName = keyScanner.nextLine();		
-        dataFile1 = new File(fileName1);
-        dataFile2 = new File(fileName2);
-        outFile = new File(outFileName);
-        Scanner fileScanner1 = new Scanner(dataFile1);
-        Scanner fileScanner2 = new Scanner(dataFile2);
-        PrintWriter printer = new PrintWriter(outFile);
+        // Store data into the linked list
+        store(input, people);
 
-        if (fileScanner1.hasNext()) {
-            hasNext1 = true; 
-            item1 = fileScanner1.nextInt();
-        } 
-        if (fileScanner2.hasNext()) {
-            hasNext2 = true; 
-            item2 = fileScanner2.nextInt();
+        // Display the contents of the linked list
+        display(System.out, people);
+
+        // Try finding some IDs
+        System.out.println("Find ID 456: index = " + find("456", people));
+        System.out.println("Find ID 999: index = " + find("999", people));
+    }
+
+    // store(): reads Person data from input stream and adds to list
+    public static void store(InputStream in, LinkedList<Person> list) {
+        Scanner scanner = new Scanner(in);
+        while (scanner.hasNext()) {
+            String firstname = scanner.next();
+            String lastname = scanner.next();
+            String ID = scanner.next();
+            list.add(new Person(firstname, lastname, ID));
         }
-        while (hasNext1 && hasNext2) {
-            if (item1 < item2) {
-                printer.print(item1);
-                printer.print(' ');
-                if (fileScanner1.hasNext()) {
-                    item1 = fileScanner1.nextInt();
-                } else {
-                    hasNext1 = false;
-                }
-            } else {
-                printer.print(item2);
-                printer.print(' ');
-                if (fileScanner2.hasNext()) {
-                    item2 = fileScanner2.nextInt();
-                } else {
-                    hasNext2 = false;
-                }
+        scanner.close();
+    }
+
+    // display(): prints each Person object on a new line
+    public static void display(PrintStream out, LinkedList<Person> list) {
+        for (Person p : list) {
+            out.println(p);
+        }
+    }
+
+    // find(): returns index of Person with matching ID (or -1)
+    public static int find(String sid, LinkedList<Person> list) {
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).getID().equals(sid)) {
+                return i;
             }
         }
-        while (hasNext1) {
-            printer.print(item1);
-            printer.print(' ');
-            if (fileScanner1.hasNext()) {
-                item1 = fileScanner1.nextInt();
-            } else {
-                hasNext1 = false;
-            }
-        }
-        while (hasNext2) {
-            printer.print(item2);
-            printer.print(' ');
-            if (fileScanner2.hasNext()) {
-                item2 = fileScanner2.nextInt();
-            } else {
-                hasNext2 = false;
-            }
-        }
-        printer.close();
-        fileScanner1.close();
-        fileScanner2.close();
-        keyScanner.close();
+        return -1;
     }
 }
 
-// ========== NEW CLASS ADDED ========== //
+// Reuse Person class from Q1
 class Person {
     private String firstname;
     private String lastname;
